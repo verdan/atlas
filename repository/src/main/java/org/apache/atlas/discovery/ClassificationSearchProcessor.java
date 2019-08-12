@@ -347,4 +347,12 @@ public class ClassificationSearchProcessor extends SearchProcessor {
             LOG.debug("<== ClassificationSearchProcessor.filter(): ret.size()={}", entityVertices.size());
         }
     }
+
+    @Override
+    public long getTotalCount() {
+        if (indexQuery != null) {
+            return indexQuery.vertexTotals();
+        }
+        return 0;
+    }
 }

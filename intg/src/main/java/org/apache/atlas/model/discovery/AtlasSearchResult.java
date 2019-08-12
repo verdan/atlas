@@ -52,6 +52,7 @@ public class AtlasSearchResult implements Serializable {
     private AttributeSearchResult          attributes;
     private List<AtlasFullTextResult>      fullTextResult;
     private Map<String, AtlasEntityHeader> referredEntities;
+    private long                            total;
 
     public AtlasSearchResult() {}
 
@@ -67,6 +68,7 @@ public class AtlasSearchResult implements Serializable {
         setAttributes(null);
         setFullTextResult(null);
         setReferredEntities(null);
+        setTotal(0);
     }
 
     public AtlasSearchResult(SearchParameters searchParameters) {
@@ -126,6 +128,12 @@ public class AtlasSearchResult implements Serializable {
         this.referredEntities = referredEntities;
     }
 
+    public long getTotal() { return total; }
+
+    public void setTotal(long total) { this.total = total; }
+
+    public void incTotal() { this.total++; }
+
     @Override
     public int hashCode() { return Objects.hash(queryType, searchParameters, queryText, type, classification, entities, attributes, fullTextResult, referredEntities); }
 
@@ -184,6 +192,7 @@ public class AtlasSearchResult implements Serializable {
                 ", attributes=" + attributes +
                 ", fullTextResult=" + fullTextResult +
                 ", referredEntities=" + referredEntities +
+                ", total=" + total +
                 '}';
     }
 

@@ -174,4 +174,9 @@ public class FreeTextSearchProcessor extends SearchProcessor {
 
         return ret;
     }
+
+    @Override
+    public long getTotalCount() {
+        return indexQuery.vertexTotals();
+    }
 }
