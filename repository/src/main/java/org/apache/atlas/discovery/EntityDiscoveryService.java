@@ -179,6 +179,7 @@ public class EntityDiscoveryService implements AtlasDiscoveryService {
             LOG.debug("Executing Full text query: {}", fullTextQuery);
         }
         ret.setFullTextResult(getIndexQueryResults(idxQuery, params, excludeDeletedEntities));
+        ret.setApproximateCount(idxQuery.vertexTotals());
 
         scrubSearchResults(ret);
 
@@ -284,7 +285,8 @@ public class EntityDiscoveryService implements AtlasDiscoveryService {
             int          resultIdx  = 0;
 
             for (int indexQueryOffset = 0; ; indexQueryOffset += getMaxResultSetSize()) {
-                final Iterator<Result<?, ?>> qryResult = graph.indexQuery(Constants.FULLTEXT_INDEX, idxQuery, indexQueryOffset).vertices();
+                final AtlasIndexQuery qry = graph.indexQuery(Constants.FULLTEXT_INDEX, idxQuery, indexQueryOffset);
+                final Iterator<Result<?, ?>> qryResult = qry.vertices();
 
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("indexQuery: query=" + idxQuery + "; offset=" + indexQueryOffset);
@@ -343,6 +345,10 @@ public class EntityDiscoveryService implements AtlasDiscoveryService {
                     }
                 }
 
+                if (ret.getApproximateCount() == 0) {
+                  ret.setApproximateCount(qry.vertexTotals());
+                }
+
                 if (ret.getEntities() != null && ret.getEntities().size() == resultSize) {
                     break;
                 }
@@ -392,7 +398,6 @@ public class EntityDiscoveryService implements AtlasDiscoveryService {
                     if (firstElement instanceof AtlasVertex) {
                         for (Object element : queryResult) {
                             if (element instanceof AtlasVertex) {
-
                                 ret.addEntity(entityRetriever.toAtlasEntityHeader((AtlasVertex) element));
                             } else {
                                 LOG.warn("searchUsingBasicQuery({}): expected an AtlasVertex; found unexpected entry in result {}", basicQuery, element);
@@ -463,6 +468,7 @@ public class EntityDiscoveryService implements AtlasDiscoveryService {
 
         try {
             List<AtlasVertex> resultList = searchContext.getSearchProcessor().execute();
+            ret.setApproximateCount(searchContext.getSearchProcessor().getResultCount());
 
             // By default any attribute that shows up in the search parameter should be sent back in the response
             // If additional values are requested then the entityAttributes will be a superset of the all search attributes
