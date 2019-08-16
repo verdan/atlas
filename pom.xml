@@ -793,6 +793,8 @@
         <module>addons/impala-bridge</module>
 
         <module>distro</module>
+
+        <module>tools/atlas-index-repair</module>
     </modules>
 
     <repositories>

@@ -32,6 +32,9 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.configuration.Configuration;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.security.UserGroupInformation;
 import org.janusgraph.core.JanusGraph;
 import org.janusgraph.core.schema.JanusGraphIndex;
 import org.janusgraph.core.schema.SchemaAction;
@@ -43,9 +46,14 @@ import org.janusgraph.graphdb.database.StandardJanusGraph;
 import org.janusgraph.graphdb.database.management.ManagementSystem;
 import org.janusgraph.graphdb.transaction.StandardJanusGraphTx;
 import org.janusgraph.graphdb.types.MixedIndexType;
+import org.janusgraph.hadoop.MapReduceIndexManagement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -71,20 +79,42 @@ public class RepairIndex {
 
     public static void main(String[] args) {
         int exitCode = EXIT_CODE_FAILED;
+        boolean useMr = false;
+
         LOG.info("Started index repair");
 
         try {
             CommandLine cmd = getCommandLine(args);
             String guid = cmd.getOptionValue("g");
 
+            String keytab = cmd.getOptionValue("kt");
+            String principal = cmd.getOptionValue("P");
+
+            if (keytab != null && !keytab.isEmpty() && principal != null && !principal.isEmpty()) {
+                displayCrlf("Logging in with Kerberos keytab: " + keytab + " principal: " + principal);
+                UserGroupInformation.loginUserFromKeytab(principal, keytab);
+            }
+
+            String files = cmd.getOptionValue("f");
+            if (files != null && !files.isEmpty()) {
+                List<String> fileList = new ArrayList<>();
+                if (keytab != null && !keytab.isEmpty()) {
+                    fileList.add(keytab);
+                }
+                fileList.addAll(Arrays.asList(files.split(",")));
+                addToHdfs(fileList.toArray(new String[fileList.size()]), new org.apache.hadoop.conf.Configuration());
+                useMr = true;
+            }
+
             if(guid != null && !guid.isEmpty()){
                 isSelectiveRestore = true;
                 String uid = cmd.getOptionValue("u");
                 String pwd = cmd.getOptionValue("p");
+
                 setupAtlasClient(uid, pwd);
             }
 
-            process(guid);
+            process(guid, useMr);
 
             LOG.info("Completed index repair!");
             exitCode = EXIT_CODE_SUCCESS;
@@ -96,7 +126,7 @@ public class RepairIndex {
         System.exit(exitCode);
     }
 
-    private static void process(String guid) throws Exception {
+    private static void process(String guid, boolean useMr) throws Exception {
         RepairIndex repairIndex = new RepairIndex();
 
         setupGraph();
@@ -104,7 +134,7 @@ public class RepairIndex {
         if (isSelectiveRestore) {
             repairIndex.restoreSelective(guid);
         }else{
-            repairIndex.restoreAll();
+            repairIndex.restoreAll(useMr);
         }
 
         displayCrlf("Repair Index: Done!");
@@ -115,6 +145,9 @@ public class RepairIndex {
         options.addOption("g", "guid", true, "guid for which update index should be executed.");
         options.addOption("u", "user", true, "User name.");
         options.addOption("p", "password", true, "Password name.");
+        options.addOption("kt", "keytab", true, "Keytab.");
+        options.addOption("P", "principal", true, "Kerberos principal");
+        options.addOption("f", "files", true, "files (incl jars) for mapreduce separated by ,");
 
         return new DefaultParser().parse(options, args);
     }
@@ -129,7 +162,7 @@ public class RepairIndex {
         return new String[]{ INDEX_NAME_VERTEX_INDEX, INDEX_NAME_EDGE_INDEX, INDEX_NAME_FULLTEXT_INDEX};
     }
 
-    private static void setupAtlasClient(String uid, String pwd) throws AtlasException {
+    private static void setupAtlasClient(String uid, String pwd) throws IOException, AtlasException {
         String[] atlasEndpoint = getAtlasRESTUrl();
         if (atlasEndpoint == null || atlasEndpoint.length == 0) {
             atlasEndpoint = new String[]{DEFAULT_ATLAS_URL};
@@ -137,14 +170,19 @@ public class RepairIndex {
         atlasClientV2 = getAtlasClientV2(atlasEndpoint, new String[]{uid, pwd});
     }
 
-    private void restoreAll() throws Exception {
+    private void restoreAll(boolean useMr) throws Exception {
         for (String indexName : getIndexes()){
             displayCrlf("Restoring: " + indexName);
             long startTime = System.currentTimeMillis();
 
             ManagementSystem mgmt = (ManagementSystem) graph.openManagement();
             JanusGraphIndex index = mgmt.getGraphIndex(indexName);
-            mgmt.updateIndex(index, SchemaAction.REINDEX).get();
+            if (!useMr) {
+                mgmt.updateIndex(index, SchemaAction.REINDEX).get();
+            } else {
+                MapReduceIndexManagement mr = new MapReduceIndexManagement(graph);
+                mr.updateIndex(index, SchemaAction.REINDEX).get();
+            }
             mgmt.commit();
 
             ManagementSystem.awaitGraphIndexStatus(graph, indexName).status(SchemaStatus.ENABLED).call();
@@ -234,7 +272,7 @@ public class RepairIndex {
         }
     }
 
-    private static AtlasClientV2 getAtlasClientV2(String[] atlasEndpoint, String[] uidPwdFromCommandLine) throws AtlasException {
+    private static AtlasClientV2 getAtlasClientV2(String[] atlasEndpoint, String[] uidPwdFromCommandLine) throws IOException, AtlasException {
         AtlasClientV2 atlasClientV2;
         if (!AuthenticationUtil.isKerberosAuthenticationEnabled()) {
             String[] uidPwd = (uidPwdFromCommandLine[0] == null || uidPwdFromCommandLine[1] == null)
@@ -246,5 +284,16 @@ public class RepairIndex {
             atlasClientV2 = new AtlasClientV2(atlasEndpoint);
         }
         return atlasClientV2;
+    }
+
+    private static void addToHdfs(String[] files, org.apache.hadoop.conf.Configuration conf) throws IOException {
+        for (String f : files) {
+            File jarFile = new File(f);
+
+            Path hdfsJar = new Path(jarFile.getName());
+            FileSystem hdfs = FileSystem.get(conf);
+            displayCrlf("Uploading " + f + " to " + hdfsJar.getName());
+            hdfs.copyFromLocalFile(false, true, new Path(f), hdfsJar);
+        }
     }
 }
