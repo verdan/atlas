@@ -46,7 +46,6 @@ import org.janusgraph.graphdb.database.StandardJanusGraph;
 import org.janusgraph.graphdb.database.management.ManagementSystem;
 import org.janusgraph.graphdb.transaction.StandardJanusGraphTx;
 import org.janusgraph.graphdb.types.MixedIndexType;
-import org.janusgraph.hadoop.MapReduceIndexManagement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
