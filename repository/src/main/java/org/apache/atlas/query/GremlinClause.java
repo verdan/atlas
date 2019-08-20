@@ -43,7 +43,7 @@ enum GremlinClause {
     RANGE("range(%s, %s + %s)"),
     SELECT("select('%s')"),
     TO_LIST("toList()"),
-    TEXT_CONTAINS("has('%s', org.janusgraph.core.attribute.Text.textContains(%s))"),
+    TEXT_CONTAINS("has('%s', org.janusgraph.core.attribute.Text.textContainsRegex(%s))"),
     TEXT_PREFIX("has('%s', org.janusgraph.core.attribute.Text.textContainsPrefix(%s))"),
     TEXT_SUFFIX("has('%s', org.janusgraph.core.attribute.Text.textContainsRegex(\".*\" + %s))"),
     TRAIT("outE('classifiedAs').has('__name', within('%s')).outV()"),
