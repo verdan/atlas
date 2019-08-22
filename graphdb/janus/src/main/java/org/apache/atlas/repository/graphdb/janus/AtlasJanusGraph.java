@@ -509,12 +509,6 @@ public class AtlasJanusGraph implements AtlasGraph<AtlasJanusVertex, AtlasJanusE
             bindings.put("graph", getGraph());
             bindings.put("g", getGraph().traversal());
 
-            String profileQuery = gremlinQuery.replace(".toList()", "");
-
-            Object ProfileResult = scriptEngine.eval(profileQuery + ".profile()", bindings);
-            LOG.debug("PROFILE RESULT" + ProfileResult);
-
-
             Object result = scriptEngine.eval(gremlinQuery, bindings);
 
             return result;
