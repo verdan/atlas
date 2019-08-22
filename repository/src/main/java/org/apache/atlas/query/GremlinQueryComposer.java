@@ -589,6 +589,7 @@ public class GremlinQueryComposer {
             LOG.debug("addOrderByClause(name={})", ia.getRaw(), descr);
         }
 
+        add(GremlinClause.HAS_PROPERTY, ia);
         add((!descr) ? GremlinClause.ORDER_BY : GremlinClause.ORDER_BY_DESC, ia);
     }
 
