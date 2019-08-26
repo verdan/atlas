@@ -333,6 +333,7 @@ public class DiscoveryREST {
             }
 
             validateSearchParameters(parameters);
+            Servlets.validateQueryParamLength("sortBy", parameters.getSortBy());
 
             return discoveryService.searchWithParameters(parameters);
         } finally {

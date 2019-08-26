@@ -23,6 +23,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.apache.atlas.SortOrder;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -44,6 +45,7 @@ public class SearchParameters implements Serializable {
     private String  typeName;
     private String  classification;
     private String  termName;
+    private String  sortBy;
     private boolean excludeDeletedEntities;
     private boolean includeClassificationAttributes;
     private boolean includeSubTypes                 = true;
@@ -54,6 +56,7 @@ public class SearchParameters implements Serializable {
     private FilterCriteria entityFilters;
     private FilterCriteria tagFilters;
     private Set<String>    attributes;
+    private SortOrder      sortOrder;
 
     public static final String WILDCARD_CLASSIFICATIONS = "*";
     public static final String ALL_CLASSIFICATIONS      = "_CLASSIFIED";
@@ -304,6 +307,22 @@ public class SearchParameters implements Serializable {
         return sb;
     }
 
+    public String getSortBy() {
+        return sortBy;
+    }
+
+    public void setSortBy(String sortBy) {
+        this.sortBy = sortBy;
+    }
+
+    public SortOrder getSortOrder() {
+        return sortOrder;
+    }
+
+    public void setSortOrder(SortOrder sortOrder) {
+        this.sortOrder = sortOrder;
+    }
+
     @Override
     public String toString() {
         return toString(new StringBuilder()).toString();
@@ -461,5 +480,7 @@ public class SearchParameters implements Serializable {
         public String toString() {
             return getSymbol();
         }
+
+
     }
 }

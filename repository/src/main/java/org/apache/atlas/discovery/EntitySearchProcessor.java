@@ -17,6 +17,7 @@
  */
 package org.apache.atlas.discovery;
 
+import org.apache.atlas.SortOrder;
 import org.apache.atlas.model.discovery.SearchParameters.FilterCriteria;
 import org.apache.atlas.repository.Constants;
 import org.apache.atlas.repository.graphdb.AtlasGraphQuery;
@@ -66,6 +67,8 @@ public class EntitySearchProcessor extends SearchProcessor {
         final Set<String>     allAttributes   = new HashSet<>();
         final Set<String>     typeAndSubTypes       = context.getEntityTypes();
         final String          typeAndSubTypesQryStr = context.getEntityTypesQryStr();
+        final String          sortBy                = context.getSearchParameters().getSortBy();
+        final SortOrder       sortOrder             = context.getSearchParameters().getSortOrder();
 
         final AtlasClassificationType classificationType            = context.getClassificationType();
         final Set<String>             classificationTypeAndSubTypes = context.getClassificationTypes();
@@ -195,6 +198,14 @@ public class EntitySearchProcessor extends SearchProcessor {
             graphQueryPredicate = null;
         }
 
+        if (sortBy != null && !sortBy.isEmpty()) {
+            AtlasGraphQuery query = context.getGraph().query();
+            if (sortOrder == SortOrder.DESCENDING) {
+                query.orderBy(sortBy, AtlasGraphQuery.SortOrder.DESC);
+            } else {
+                query.orderBy(sortBy, AtlasGraphQuery.SortOrder.ASC);
+            }
+        }
 
         // Prepare the graph query and in-memory filter for the filtering phase
         filterGraphQueryPredicate = typeNamePredicate;
