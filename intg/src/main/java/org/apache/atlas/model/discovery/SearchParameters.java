@@ -276,13 +276,15 @@ public class SearchParameters implements Serializable {
                 Objects.equals(termName, that.termName) &&
                 Objects.equals(entityFilters, that.entityFilters) &&
                 Objects.equals(tagFilters, that.tagFilters) &&
-                Objects.equals(attributes, that.attributes);
+                Objects.equals(attributes, that.attributes) &&
+                Objects.equals(sortBy, that.sortBy) &&
+                Objects.equals(sortOrder, that.sortOrder);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(query, typeName, classification, termName, excludeDeletedEntities, includeClassificationAttributes,
-                            limit, offset, entityFilters, tagFilters, attributes);
+                            limit, offset, entityFilters, tagFilters, attributes, sortBy, sortOrder);
     }
 
     public StringBuilder toString(StringBuilder sb) {
@@ -302,6 +304,8 @@ public class SearchParameters implements Serializable {
         sb.append(", entityFilters=").append(entityFilters);
         sb.append(", tagFilters=").append(tagFilters);
         sb.append(", attributes=").append(attributes);
+        sb.append(", sortBy=").append(sortBy).append('\'');
+        sb.append(", sortOrder=").append(sortOrder).append('\'');
         sb.append('}');
 
         return sb;
