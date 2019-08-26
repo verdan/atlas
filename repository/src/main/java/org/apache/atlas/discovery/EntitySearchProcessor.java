@@ -47,6 +47,8 @@ import static org.apache.atlas.repository.Constants.PROPAGATED_TRAIT_NAMES_PROPE
 import static org.apache.atlas.repository.Constants.TRAIT_NAMES_PROPERTY_KEY;
 import static org.apache.atlas.repository.graphdb.AtlasGraphQuery.ComparisionOperator.EQUAL;
 import static org.apache.atlas.repository.graphdb.AtlasGraphQuery.ComparisionOperator.NOT_EQUAL;
+import static org.apache.atlas.repository.graphdb.AtlasGraphQuery.SortOrder.ASC;
+import static org.apache.atlas.repository.graphdb.AtlasGraphQuery.SortOrder.DESC;
 
 public class EntitySearchProcessor extends SearchProcessor {
     private static final Logger LOG      = LoggerFactory.getLogger(EntitySearchProcessor.class);
@@ -193,18 +195,24 @@ public class EntitySearchProcessor extends SearchProcessor {
                     graphQueryPredicate = activePredicate;
                 }
             }
+
+            if (sortBy != null && !sortBy.isEmpty()) {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("==> EntitySearchProcessor SORT BY: ({})", sortBy);
+                }
+
+                AtlasGraphQuery.SortOrder qrySortOrder = sortOrder == SortOrder.ASCENDING ? ASC : DESC;
+                graphQuery.orderBy(sortBy, qrySortOrder);
+            }
+
+
         } else {
             graphQuery = null;
             graphQueryPredicate = null;
         }
 
-        if (sortBy != null && !sortBy.isEmpty()) {
-            AtlasGraphQuery query = context.getGraph().query();
-            if (sortOrder == SortOrder.DESCENDING) {
-                query.orderBy(sortBy, AtlasGraphQuery.SortOrder.DESC);
-            } else {
-                query.orderBy(sortBy, AtlasGraphQuery.SortOrder.ASC);
-            }
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("==> EntitySearchProcessor QUERY: ({})", graphQuery);
         }
 
         // Prepare the graph query and in-memory filter for the filtering phase
