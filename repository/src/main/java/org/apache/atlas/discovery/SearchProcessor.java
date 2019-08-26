@@ -148,6 +148,11 @@ public abstract class SearchProcessor {
     }
 
     public void filter(List<AtlasVertex> entityVertices) {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("==> SearchProcessor.filter({})", entityVertices.size());
+            LOG.debug("==> SearchProcessor.filter: Next Processor({})", nextProcessor);
+        }
+
         if (nextProcessor != null && CollectionUtils.isNotEmpty(entityVertices)) {
             nextProcessor.filter(entityVertices);
         }

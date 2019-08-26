@@ -27,11 +27,14 @@ import com.google.common.base.Function;
 import com.google.common.collect.Iterators;
 import org.janusgraph.core.JanusGraphIndexQuery;
 import org.janusgraph.core.JanusGraphVertex;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Janus implementation of AtlasIndexQuery.
  */
 public class AtlasJanusIndexQuery implements AtlasIndexQuery<AtlasJanusVertex, AtlasJanusEdge> {
+    private static final Logger LOG = LoggerFactory.getLogger(AtlasJanusIndexQuery.class);
     private AtlasJanusGraph      graph;
     private JanusGraphIndexQuery query;
 
@@ -58,6 +61,9 @@ public class AtlasJanusIndexQuery implements AtlasIndexQuery<AtlasJanusVertex, A
 
     @Override
     public Iterator<Result<AtlasJanusVertex, AtlasJanusEdge>> vertices(int offset, int limit) {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Executing: Index Query");
+        }
         Preconditions.checkArgument(offset >=0, "Index offset should be greater than or equals to 0");
         Preconditions.checkArgument(limit >=0, "Index limit should be greater than or equals to 0");
         Iterator<JanusGraphIndexQuery.Result<JanusGraphVertex>> results = query

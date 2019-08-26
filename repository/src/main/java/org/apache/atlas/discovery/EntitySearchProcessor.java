@@ -232,6 +232,14 @@ public class EntitySearchProcessor extends SearchProcessor {
         if (context.getSearchParameters().getExcludeDeletedEntities()) {
             filterGraphQueryPredicate = PredicateUtils.andPredicate(filterGraphQueryPredicate, activePredicate);
         }
+
+
+        AtlasGraphQuery newQuery = context.getGraph().query();
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("==> EntitySearchProcessor New Query: ({})", newQuery);
+            LOG.debug("==> EntitySearchProcessor Index Query: ({})", indexQuery);
+        }
+
     }
 
     @Override
@@ -284,12 +292,23 @@ public class EntitySearchProcessor extends SearchProcessor {
                     if (graphQueryPredicate != null) {
                         CollectionUtils.filter(entityVertices, graphQueryPredicate);
                     }
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("==> EntitySearchProcessor.execute Index Query Result ({}) ", idxQueryResult);
+                    }
+
                 } else {
                     Iterator<AtlasVertex> queryResult = graphQuery.vertices(qryOffset, limit).iterator();
 
                     getVertices(queryResult, entityVertices);
 
                     isLastResultPage = entityVertices.size() < limit;
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("==> EntitySearchProcessor.execute Graph Query Result ({}) ", queryResult);
+                    }
+                }
+
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("==> EntitySearchProcessor.execute Entity Vertices ({}) ", entityVertices);
                 }
 
                 super.filter(entityVertices);
