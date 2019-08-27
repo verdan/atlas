@@ -34,7 +34,7 @@
          Some dependencies, like slf4j are excluded from the jar because they are included in Atlas -->
 
     <properties>
-        <tinkerpop.version>3.3.3</tinkerpop.version>
+        <tinkerpop.version>3.4.1</tinkerpop.version>
         <checkstyle.failOnViolation>false</checkstyle.failOnViolation>
         <lucene-solr.version>7.3.0</lucene-solr.version>
     </properties>
