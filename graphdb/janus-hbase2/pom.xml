@@ -44,10 +44,9 @@
         </dependency>
 
          <dependency>
-            <groupId>org.apache.hadoop</groupId>
-            <artifactId>hadoop-common</artifactId>
-            <version>${hadoop.version}</version>
-            <scope>provided</scope>
+             <groupId>org.janusgraph</groupId>
+             <artifactId>janusgraph-hadoop-core</artifactId>
+             <version>${janus.version}</version>
         </dependency>
 
         <dependency>

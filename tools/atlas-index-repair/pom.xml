@@ -56,6 +56,15 @@
             <version>${janus.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.janusgraph</groupId>
+            <artifactId>janusgraph-hadoop</artifactId>
+            <version>${janus.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-common</artifactId>
+        </dependency>
     </dependencies>
 
 </project>
