@@ -23,6 +23,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.apache.atlas.SortOrder;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -44,6 +45,7 @@ public class SearchParameters implements Serializable {
     private String  typeName;
     private String  classification;
     private String  termName;
+    private String  sortBy;
     private boolean excludeDeletedEntities;
     private boolean includeClassificationAttributes;
     private boolean includeSubTypes                 = true;
@@ -54,6 +56,7 @@ public class SearchParameters implements Serializable {
     private FilterCriteria entityFilters;
     private FilterCriteria tagFilters;
     private Set<String>    attributes;
+    private SortOrder      sortOrder;
 
     public static final String WILDCARD_CLASSIFICATIONS = "*";
     public static final String ALL_CLASSIFICATIONS      = "_CLASSIFIED";
@@ -273,13 +276,15 @@ public class SearchParameters implements Serializable {
                 Objects.equals(termName, that.termName) &&
                 Objects.equals(entityFilters, that.entityFilters) &&
                 Objects.equals(tagFilters, that.tagFilters) &&
-                Objects.equals(attributes, that.attributes);
+                Objects.equals(attributes, that.attributes) &&
+                Objects.equals(sortBy, that.sortBy) &&
+                Objects.equals(sortOrder, that.sortOrder);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(query, typeName, classification, termName, excludeDeletedEntities, includeClassificationAttributes,
-                            limit, offset, entityFilters, tagFilters, attributes);
+                            limit, offset, entityFilters, tagFilters, attributes, sortBy, sortOrder);
     }
 
     public StringBuilder toString(StringBuilder sb) {
@@ -299,9 +304,27 @@ public class SearchParameters implements Serializable {
         sb.append(", entityFilters=").append(entityFilters);
         sb.append(", tagFilters=").append(tagFilters);
         sb.append(", attributes=").append(attributes);
+        sb.append(", sortBy=").append(sortBy).append('\'');
+        sb.append(", sortOrder=").append(sortOrder).append('\'');
         sb.append('}');
 
         return sb;
+    }
+
+    public String getSortBy() {
+        return sortBy;
+    }
+
+    public void setSortBy(String sortBy) {
+        this.sortBy = sortBy;
+    }
+
+    public SortOrder getSortOrder() {
+        return sortOrder;
+    }
+
+    public void setSortOrder(SortOrder sortOrder) {
+        this.sortOrder = sortOrder;
     }
 
     @Override
@@ -461,5 +484,7 @@ public class SearchParameters implements Serializable {
         public String toString() {
             return getSymbol();
         }
+
+
     }
 }
