@@ -42,6 +42,29 @@
     "expectedCount": 2
   },
   {
+    "testDescription": "hive_column.name contains 30 order by name descending",
+    "searchParameters": {
+      "typeName": "hive_column",
+      "excludeDeletedEntities": true,
+      "classification": "",
+      "query": "",
+      "limit": 25,
+      "offset": 25,
+      "sortBy": "qualifiedName",
+      "sortOrder": "DESCENDING",
+      "entityFilters": {
+        "attributeName": "name",
+        "operator": "contains",
+        "attributeValue": "30"
+      },
+      "tagFilters": null,
+      "attributes": [
+        ""
+      ]
+    },
+    "expectedCount": 2
+  },
+  {
     
     "testDescription": "hive_table matches name testtable_0",
     "searchParameters": {

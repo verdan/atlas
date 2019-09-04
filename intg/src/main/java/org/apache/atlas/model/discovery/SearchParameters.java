@@ -261,6 +261,30 @@ public class SearchParameters implements Serializable {
         this.attributes = attributes;
     }
 
+    /**
+     * @return Attribute on which to sort the results
+     */
+    public String getSortBy() { return sortBy; }
+
+    /**
+     * Sort the results based on sortBy attribute
+     * @param sortBy Attribute on which to sort the results
+     */
+    public void setSortBy(String sortBy) { this.sortBy = sortBy; }
+
+    /**
+     * @return Sorting order of the results
+     */
+    public SortOrder getSortOrder() {
+        return sortOrder;
+    }
+
+    /**
+     * Sorting order to sort the results
+     * @param sortOrder ASCENDING vs DESCENDING
+     */
+    public void setSortOrder(SortOrder sortOrder) { this.sortOrder = sortOrder; }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -309,22 +333,6 @@ public class SearchParameters implements Serializable {
         sb.append('}');
 
         return sb;
-    }
-
-    public String getSortBy() {
-        return sortBy;
-    }
-
-    public void setSortBy(String sortBy) {
-        this.sortBy = sortBy;
-    }
-
-    public SortOrder getSortOrder() {
-        return sortOrder;
-    }
-
-    public void setSortOrder(SortOrder sortOrder) {
-        this.sortOrder = sortOrder;
     }
 
     @Override
