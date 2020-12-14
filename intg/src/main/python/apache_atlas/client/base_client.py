@@ -22,43 +22,44 @@ import os
 import json
 import logging
 
-from requests                         import Session
-from apache_atlas.client.discovery    import DiscoveryClient
-from apache_atlas.client.entity       import EntityClient
-from apache_atlas.client.glossary     import GlossaryClient
-from apache_atlas.client.lineage      import LineageClient
+from requests import Session
+from apache_atlas.client.discovery import DiscoveryClient
+from apache_atlas.client.entity import EntityClient
+from apache_atlas.client.glossary import GlossaryClient
+from apache_atlas.client.lineage import LineageClient
 from apache_atlas.client.relationship import RelationshipClient
-from apache_atlas.client.typedef      import TypeDefClient
-from apache_atlas.exceptions          import AtlasServiceException
-from apache_atlas.utils               import HttpMethod, HTTPStatus, type_coerce
+from apache_atlas.client.admin import AdminClient
+from apache_atlas.client.typedef import TypeDefClient
 
+from apache_atlas.exceptions import AtlasServiceException
+from apache_atlas.utils import HttpMethod, HTTPStatus, type_coerce
 
 LOG = logging.getLogger('apache_atlas')
 
 
 class AtlasClient:
     def __init__(self, host, auth):
-        session      = Session()
+        session = Session()
         session.auth = auth
 
-        self.host           = host
-        self.session        = session
+        self.host = host
+        self.session = session
         self.request_params = {'headers': {}}
-        self.typedef        = TypeDefClient(self)
-        self.entity         = EntityClient(self)
-        self.lineage        = LineageClient(self)
-        self.discovery      = DiscoveryClient(self)
-        self.glossary       = GlossaryClient(self)
-        self.relationship   = RelationshipClient(self)
+        self.typedef = TypeDefClient(self)
+        self.entity = EntityClient(self)
+        self.lineage = LineageClient(self)
+        self.discovery = DiscoveryClient(self)
+        self.glossary = GlossaryClient(self)
+        self.relationship = RelationshipClient(self)
+        self.admin = AdminClient(self)
 
         logging.getLogger("requests").setLevel(logging.WARNING)
 
-
     def call_api(self, api, response_type=None, query_params=None, request_obj=None):
         params = copy.deepcopy(self.request_params)
-        path   = os.path.join(self.host, api.path)
+        path = os.path.join(self.host, api.path)
 
-        params['headers']['Accept']       = api.consumes
+        params['headers']['Accept'] = api.consumes
         params['headers']['Content-type'] = api.produces
 
         if query_params:

@@ -17,11 +17,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from apache_atlas.utils import *
+from apache_atlas.model.instance import AtlasBase
 
 
-class AtlasMetrics(AtlasBase):
-    def __init__(self, attrs={}):
+class AtlasAdminMetrics(AtlasBase):
+    def __init__(self, attrs=None):
         AtlasBase.__init__(self, attrs)
 
-        self.data = attrs.get('data')
+        attrs = attrs or {}
+        _data = attrs.get('data', {})
+        self.general = _data.get('general', {})
+        self.tag = _data.get('tag', {})
+        self.entity = _data.get('entity', {})
