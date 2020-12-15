@@ -29,3 +29,4 @@ class AtlasAdminMetrics(AtlasBase):
         self.general = _data.get('general', {})
         self.tag = _data.get('tag', {})
         self.entity = _data.get('entity', {})
+        self.system = _data.get('system', {})
