@@ -58,6 +58,8 @@ public class RequestContext {
     private final AtlasPerfMetrics                       metrics              = isMetricsEnabled ? new AtlasPerfMetrics() : null;
     private       List<EntityGuidPair>                   entityGuidInRequest  = null;
     private final Set<String>                            entitiesToSkipUpdate = new HashSet<>();
+    private final Set<String>                            onlyCAUpdateEntities = new HashSet<>();
+    private final Set<String>                            onlyBAUpdateEntities = new HashSet<>();
 
     private String       user;
     private Set<String>  userGroups;
@@ -115,6 +117,8 @@ public class RequestContext {
         this.addedPropagations.clear();
         this.removedPropagations.clear();
         this.entitiesToSkipUpdate.clear();
+        this.onlyCAUpdateEntities.clear();
+        this.onlyBAUpdateEntities.clear();
 
         if (metrics != null && !metrics.isEmpty()) {
             METRICS.debug(metrics.toString());
@@ -243,6 +247,26 @@ public class RequestContext {
         }
     }
 
+    public void recordEntityWithCustomAttributeUpdate(String guid) {
+        if(! StringUtils.isEmpty(guid)) {
+            onlyCAUpdateEntities.add(guid);
+        }
+    }
+
+    public void recordEntityWithBusinessAttributeUpdate(String guid) {
+        if(! StringUtils.isEmpty(guid)) {
+            onlyBAUpdateEntities.add(guid);
+        }
+    }
+
+    public boolean checkIfEntityIsForCustomAttributeUpdate(String guid) {
+        return StringUtils.isNotEmpty(guid) && onlyCAUpdateEntities.contains(guid);
+    }
+
+    public boolean checkIfEntityIsForBusinessAttributeUpdate(String guid) {
+        return StringUtils.isNotEmpty(guid) && onlyBAUpdateEntities.contains(guid);
+    }
+
     public void recordEntityDelete(AtlasEntityHeader entity) {
         if (entity != null && entity.getGuid() != null) {
             deletedEntities.put(entity.getGuid(), entity);
@@ -327,6 +351,14 @@ public class RequestContext {
 
     public Collection<AtlasEntityHeader> getDeletedEntities() {
         return deletedEntities.values();
+    }
+
+    public void clearRemovePropagations() {
+        removedPropagations.clear();
+    }
+
+    public void clearAddedPropagations() {
+        addedPropagations.clear();
     }
 
     /**
