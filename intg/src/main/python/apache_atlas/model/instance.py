@@ -20,17 +20,15 @@
 import apache_atlas.model.glossary
 
 from apache_atlas.model.enums import *
-from apache_atlas.model.misc import *
-from apache_atlas.utils import *
+from apache_atlas.model.misc  import *
+from apache_atlas.utils       import *
 
 
 class AtlasStruct(AtlasBase):
-    def __init__(self, attrs=None):
+    def __init__(self, attrs={}):
         AtlasBase.__init__(self, attrs)
 
-        if attrs is None:
-            attrs = {}
-        self.typeName = attrs.get('typeName')
+        self.typeName   = attrs.get('typeName')
         self.attributes = attrs.get('attributes')
 
     def get_attribute(self, name):
@@ -48,18 +46,16 @@ class AtlasStruct(AtlasBase):
 
 
 class AtlasEntity(AtlasStruct):
-    def __init__(self, attrs=None):
+    def __init__(self, attrs={}):
         AtlasStruct.__init__(self, attrs)
 
-        if attrs is None:
-            attrs = {}
-        self.guid = attrs.get('guid')
+        self.guid                   = attrs.get('guid')
         self.relationshipAttributes = attrs.get('relationshipAttributes')
-        self.classifications = attrs.get('classifications')
-        self.meanings = attrs.get('meanings')
-        self.customAttributes = attrs.get('customAttributes')
-        self.businessAttributes = attrs.get('businessAttributes')
-        self.labels = attrs.get('labels')
+        self.classifications        = attrs.get('classifications')
+        self.meanings               = attrs.get('meanings')
+        self.customAttributes       = attrs.get('customAttributes')
+        self.businessAttributes     = attrs.get('businessAttributes')
+        self.labels                 = attrs.get('labels')
 
         if self.guid is None:
             self.guid = next_id()
@@ -68,11 +64,10 @@ class AtlasEntity(AtlasStruct):
         super(AtlasEntity, self).type_coerce_attrs()
 
         self.classifications = type_coerce_list(self.classifications, AtlasClassification)
-        self.meanings = type_coerce_list(self.meanings, apache_atlas.model.glossary.AtlasTermAssignmentHeader)
+        self.meanings        = type_coerce_list(self.meanings, apache_atlas.model.glossary.AtlasTermAssignmentHeader)
 
     def get_relationship_attribute(self, name):
-        return self.relationshipAttributes[
-            name] if self.relationshipAttributes and name in self.relationshipAttributes else None
+        return self.relationshipAttributes[name] if self.relationshipAttributes and name in self.relationshipAttributes else None
 
     def set_relationship_attribute(self, name, value):
         if self.relationshipAttributes is None:
@@ -86,11 +81,9 @@ class AtlasEntity(AtlasStruct):
 
 
 class AtlasEntityExtInfo(AtlasBase):
-    def __init__(self, attrs=None):
+    def __init__(self, attrs={}):
         AtlasBase.__init__(self, attrs)
 
-        if attrs is None:
-            attrs = {}
         self.referredEntities = attrs.get('referredEntities')
 
     def type_coerce_attrs(self):
@@ -107,13 +100,10 @@ class AtlasEntityExtInfo(AtlasBase):
 
         self.referredEntities[entity.guid] = entity
 
-
 class AtlasEntityWithExtInfo(AtlasEntityExtInfo):
-    def __init__(self, attrs=None):
+    def __init__(self, attrs={}):
         AtlasEntityExtInfo.__init__(self, attrs)
 
-        if attrs is None:
-            attrs = {}
         self.entity = attrs.get('entity')
 
     def type_coerce_attrs(self):
@@ -123,17 +113,15 @@ class AtlasEntityWithExtInfo(AtlasEntityExtInfo):
 
 
 class AtlasEntitiesWithExtInfo(AtlasEntityExtInfo):
-    def __init__(self, attrs=None):
+    def __init__(self, attrs={}):
         AtlasEntityExtInfo.__init__(self, attrs)
 
-        if attrs is None:
-            attrs = {}
         self.entities = attrs.get('entities')
 
     def type_coerce_attrs(self):
         super(AtlasEntitiesWithExtInfo, self).type_coerce_attrs()
 
-        self.entities = type_coerce_list(self.entities, AtlasEntity)
+        self.entities = type_coerce_list(self.entity, AtlasEntity)
 
     def add_entity(self, entity):
         if self.entities is None:
@@ -143,41 +131,38 @@ class AtlasEntitiesWithExtInfo(AtlasEntityExtInfo):
 
 
 class AtlasEntityHeader(AtlasStruct):
-    def __init__(self, attrs=None):
+    def __init__(self, attrs={}):
         AtlasStruct.__init__(self, attrs)
 
-        if attrs is None:
-            attrs = {}
-        self.guid = attrs.get('guid')
-        self.status = non_null(attrs.get('status'), EntityStatus.ACTIVE.name)
-        self.displayText = attrs.get('displayText')
+        self.guid                = attrs.get('guid')
+        self.status              = non_null(attrs.get('status'), EntityStatus.ACTIVE.name)
+        self.displayText         = attrs.get('displayText')
         self.classificationNames = attrs.get('classificationNames')
-        self.classifications = attrs.get('classifications')
-        self.meaningNames = attrs.get('meaningNames')
-        self.meanings = attrs.get('.meanings')
-        self.isIncomplete = non_null(attrs.get('isIncomplete'), False)
-        self.labels = attrs.get('labels')
+        self.classifications     = attrs.get('classifications')
+        self.meaningNames        = attrs.get('meaningNames')
+        self.meanings            = attrs.get('.meanings')
+        self.isIncomplete        = non_null(attrs.get('isIncomplete'), False)
+        self.labels              = attrs.get('labels')
 
         if self.guid is None:
             self.guid = next_id()
+
 
     def type_coerce_attrs(self):
         super(AtlasEntityHeader, self).type_coerce_attrs()
 
         self.classifications = type_coerce_list(self.classifications, AtlasClassification)
-        self.meanings = type_coerce_list(self.meanings, apache_atlas.model.glossary.AtlasTermAssignmentHeader)
+        self.meanings        = type_coerce_list(self.meanings, apache_atlas.model.glossary.AtlasTermAssignmentHeader)
 
 
 class AtlasClassification(AtlasStruct):
-    def __init__(self, attrs=None):
+    def __init__(self, attrs={}):
         AtlasStruct.__init__(self, attrs)
 
-        if attrs is None:
-            attrs = {}
-        self.entityGuid = attrs.get('entityGuid')
-        self.entityStatus = non_null(attrs.get('entityStatus'), EntityStatus.ACTIVE.name)
-        self.propagate = attrs.get('propagate');
-        self.validityPeriods = attrs.get('validityPeriods')
+        self.entityGuid                       = attrs.get('entityGuid')
+        self.entityStatus                     = non_null(attrs.get('entityStatus'), EntityStatus.ACTIVE.name)
+        self.propagate                        = attrs.get('propagate');
+        self.validityPeriods                  = attrs.get('validityPeriods')
         self.removePropagationsOnEntityDelete = attrs.get('removePropagationsOnEntityDelete')
 
     def type_coerce_attrs(self):
@@ -187,27 +172,23 @@ class AtlasClassification(AtlasStruct):
 
 
 class AtlasObjectId(AtlasBase):
-    def __init__(self, attrs=None):
+    def __init__(self, attrs={}):
         AtlasBase.__init__(self, attrs)
 
-        if attrs is None:
-            attrs = {}
-        self.guid = attrs.get('guid')
-        self.typeName = attrs.get('typeName')
+        self.guid             = attrs.get('guid')
+        self.typeName         = attrs.get('typeName')
         self.uniqueAttributes = attrs.get('uniqueAttributes')
 
 
 class AtlasRelatedObjectId(AtlasObjectId):
-    def __init__(self, attrs=None):
+    def __init__(self, attrs={}):
         AtlasObjectId.__init__(self, attrs)
 
-        if attrs is None:
-            attrs = {}
-        self.entityStatus = attrs.get('entityStatus')
-        self.displayText = attrs.get('displayText')
-        self.relationshipType = attrs.get('relationshipType')
-        self.relationshipGuid = attrs.get('relationshipGuid')
-        self.relationshipStatus = attrs.get('relationshipStatus')
+        self.entityStatus           = attrs.get('entityStatus')
+        self.displayText            = attrs.get('displayText')
+        self.relationshipType       = attrs.get('relationshipType')
+        self.relationshipGuid       = attrs.get('relationshipGuid')
+        self.relationshipStatus     = attrs.get('relationshipStatus')
         self.relationshipAttributes = attrs.get('relationshipAttributes')
 
     def type_coerce_attrs(self):
@@ -217,23 +198,19 @@ class AtlasRelatedObjectId(AtlasObjectId):
 
 
 class AtlasClassifications(Plist):
-    def __init__(self, attrs=None):
+    def __init__(self,  attrs={}):
         Plist.__init__(self, attrs)
-        if attrs is None:
-            attrs = {}
 
     def type_coerce_attrs(self):
         super(AtlasClassifications, self).type_coerce_attrs()
 
-        Plist.list = type_coerce_list(Plist.list, AtlasClassification)
+        PList.list = type_coerce_list(Plist.list, AtlasClassification)
 
 
 class AtlasEntityHeaders(AtlasBase):
-    def __init__(self, attrs=None):
+    def __init__(self, attrs={}):
         AtlasBase.__init__(self, attrs)
 
-        if attrs is None:
-            attrs = {}
         self.guidHeaderMap = attrs.get('guidHeaderMap')
 
     def type_coerce_attrs(self):
@@ -243,11 +220,9 @@ class AtlasEntityHeaders(AtlasBase):
 
 
 class EntityMutationResponse(AtlasBase):
-    def __init__(self, attrs=None):
+    def __init__(self, attrs={}):
         AtlasBase.__init__(self, attrs)
 
-        if attrs is None:
-            attrs = {}
         self.mutatedEntities = attrs.get('mutatedEntities')
         self.guidAssignments = attrs.get('guidAssignments')
 
@@ -261,11 +236,9 @@ class EntityMutationResponse(AtlasBase):
 
 
 class EntityMutations(AtlasBase):
-    def __init__(self, attrs=None):
+    def __init__(self, attrs={}):
         AtlasBase.__init__(self, attrs)
 
-        if attrs is None:
-            attrs = {}
         self.entity_mutations = attrs.get('entity_mutations')
 
     def type_coerce_attrs(self):
@@ -275,12 +248,10 @@ class EntityMutations(AtlasBase):
 
 
 class EntityMutation(AtlasBase):
-    def __init__(self, attrs=None):
+    def __init__(self, attrs={}):
         AtlasBase.__init__(self, attrs)
 
-        if attrs is None:
-            attrs = {}
-        self.op = attrs.get('op')
+        self.op     = attrs.get('op')
         self.entity = attrs.get('entity')
 
     def type_coerce_attrs(self):
@@ -290,29 +261,25 @@ class EntityMutation(AtlasBase):
 
 
 class AtlasCheckStateRequest(AtlasBase):
-    def __init__(self, attrs=None):
+    def __init__(self, attrs={}):
         AtlasBase.__init__(self, attrs)
 
-        if attrs is None:
-            attrs = {}
         self.entityGuids = attrs.get('entityGuids')
         self.entityTypes = attrs.get('entityTypes')
-        self.fixIssues = attrs.get('fixIssues')
+        self.fixIssues   = attrs.get('fixIssues')
 
 
 class AtlasCheckStateResult(AtlasBase):
-    def __init__(self, attrs=None):
+    def __init__(self, attrs={}):
         AtlasBase.__init__(self, attrs)
 
-        if attrs is None:
-            attrs = {}
-        self.entitiesScanned = attrs.get('entitiesScanned')
-        self.entitiesOk = attrs.get('entitiesOk')
-        self.entitiesFixed = attrs.get('entitiesFixed')
+        self.entitiesScanned        = attrs.get('entitiesScanned')
+        self.entitiesOk             = attrs.get('entitiesOk')
+        self.entitiesFixed          = attrs.get('entitiesFixed')
         self.entitiesPartiallyFixed = attrs.get('entitiesPartiallyFixed')
-        self.entitiesNotFixed = attrs.get('entitiesNotFixed')
-        self.state = attrs.get('state')
-        self.entities = attrs.get('entities')
+        self.entitiesNotFixed       = attrs.get('entitiesNotFixed')
+        self.state                  = attrs.get('state')
+        self.entities               = attrs.get('entities')
 
     def type_coerce_attrs(self):
         super(AtlasCheckStateResult, self).type_coerce_attrs()
@@ -321,14 +288,12 @@ class AtlasCheckStateResult(AtlasBase):
 
 
 class AtlasEntityState(AtlasBase):
-    def __init__(self, attrs=None):
+    def __init__(self, attrs={}):
         AtlasBase.__init__(self, attrs)
 
-        if attrs is None:
-            attrs = {}
-        self.guid = attrs.get('guid')
+        self.guid     = attrs.get('guid')
         self.typeName = attrs.get('typeName')
-        self.name = attrs.get('name')
-        self.status = attrs.get('status')
-        self.state = attrs.get('state')
-        self.issues = attrs.get('issues')
+        self.name     = attrs.get('name')
+        self.status   = attrs.get('status')
+        self.state    = attrs.get('state')
+        self.issues   = attrs.get('issues')

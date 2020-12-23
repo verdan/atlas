@@ -18,42 +18,39 @@
 # limitations under the License.
 
 from apache_atlas.model.discovery import *
-from apache_atlas.utils import API, HttpMethod, HTTPStatus
-
-DEFAULT_LIMIT = 100
-DEFAULT_OFFSET = 0
+from apache_atlas.utils           import API, HttpMethod, HTTPStatus
 
 
 class DiscoveryClient:
-    DISCOVERY_URI = BASE_URI + "v2/search"
-    DSL_SEARCH_URI = DISCOVERY_URI + "/dsl"
+    DISCOVERY_URI        = BASE_URI + "v2/search"
+    DSL_SEARCH_URI       = DISCOVERY_URI + "/dsl"
     FULL_TEXT_SEARCH_URI = DISCOVERY_URI + "/fulltext"
-    BASIC_SEARCH_URI = DISCOVERY_URI + "/basic"
-    FACETED_SEARCH_URI = BASIC_SEARCH_URI
-    SAVED_SEARCH_URI = DISCOVERY_URI + "/saved"
-    QUICK_SEARCH_URI = DISCOVERY_URI + "/quick"
+    BASIC_SEARCH_URI     = DISCOVERY_URI + "/basic"
+    FACETED_SEARCH_URI   = BASIC_SEARCH_URI
+    SAVED_SEARCH_URI     = DISCOVERY_URI + "/saved"
+    QUICK_SEARCH_URI     = DISCOVERY_URI + "/quick"
 
-    DSL_SEARCH = API(DSL_SEARCH_URI, HttpMethod.GET, HTTPStatus.OK)
-    FULL_TEXT_SEARCH = API(FULL_TEXT_SEARCH_URI, HttpMethod.GET, HTTPStatus.OK)
-    BASIC_SEARCH = API(BASIC_SEARCH_URI, HttpMethod.GET, HTTPStatus.OK)
-    FACETED_SEARCH = API(FACETED_SEARCH_URI, HttpMethod.POST, HTTPStatus.OK)
-    ATTRIBUTE_SEARCH = API(DISCOVERY_URI + "/attribute", HttpMethod.GET, HTTPStatus.OK)
-    RELATIONSHIP_SEARCH = API(DISCOVERY_URI + "/relationship", HttpMethod.GET, HTTPStatus.OK)
-    QUICK_SEARCH_WITH_GET = API(QUICK_SEARCH_URI, HttpMethod.GET, HTTPStatus.OK)
+    DSL_SEARCH             = API(DSL_SEARCH_URI, HttpMethod.GET, HTTPStatus.OK)
+    FULL_TEXT_SEARCH       = API(FULL_TEXT_SEARCH_URI, HttpMethod.GET, HTTPStatus.OK)
+    BASIC_SEARCH           = API(BASIC_SEARCH_URI, HttpMethod.GET, HTTPStatus.OK)
+    FACETED_SEARCH         = API(FACETED_SEARCH_URI, HttpMethod.POST, HTTPStatus.OK)
+    ATTRIBUTE_SEARCH       = API(DISCOVERY_URI + "/attribute", HttpMethod.GET, HTTPStatus.OK)
+    RELATIONSHIP_SEARCH    = API(DISCOVERY_URI + "/relationship", HttpMethod.GET, HTTPStatus.OK)
+    QUICK_SEARCH_WITH_GET  = API(QUICK_SEARCH_URI, HttpMethod.GET, HTTPStatus.OK)
     QUICK_SEARCH_WITH_POST = API(QUICK_SEARCH_URI, HttpMethod.POST, HTTPStatus.OK)
-    GET_SUGGESTIONS = API(DISCOVERY_URI + "/suggestions", HttpMethod.GET, HTTPStatus.OK)
+    GET_SUGGESTIONS        = API(DISCOVERY_URI + "/suggestions", HttpMethod.GET, HTTPStatus.OK)
 
     # Saved Search
-    GET_SAVED_SEARCHES = API(SAVED_SEARCH_URI, HttpMethod.GET, HTTPStatus.OK)
-    GET_SAVED_SEARCH = API(SAVED_SEARCH_URI + "/{search_name}", HttpMethod.GET, HTTPStatus.OK)
-    ADD_SAVED_SEARCH = API(SAVED_SEARCH_URI, HttpMethod.POST, HTTPStatus.OK)
-    UPDATE_SAVED_SEARCH = API(SAVED_SEARCH_URI, HttpMethod.PUT, HTTPStatus.OK)
-    DELETE_SAVED_SEARCH = API(SAVED_SEARCH_URI + "/{guid}", HttpMethod.DELETE, HTTPStatus.NO_CONTENT)
+    GET_SAVED_SEARCHES           = API(SAVED_SEARCH_URI, HttpMethod.GET, HTTPStatus.OK)
+    GET_SAVED_SEARCH             = API(SAVED_SEARCH_URI + "/{search_name}", HttpMethod.GET, HTTPStatus.OK)
+    ADD_SAVED_SEARCH             = API(SAVED_SEARCH_URI, HttpMethod.POST, HTTPStatus.OK)
+    UPDATE_SAVED_SEARCH          = API(SAVED_SEARCH_URI, HttpMethod.PUT, HTTPStatus.OK)
+    DELETE_SAVED_SEARCH          = API(SAVED_SEARCH_URI + "/{guid}", HttpMethod.DELETE, HTTPStatus.NO_CONTENT)
     EXECUTE_SAVED_SEARCH_BY_NAME = API(SAVED_SEARCH_URI + "/execute/{search_name}", HttpMethod.GET, HTTPStatus.OK)
     EXECUTE_SAVED_SEARCH_BY_GUID = API(SAVED_SEARCH_URI + "/execute/guid/{search_guid}", HttpMethod.GET, HTTPStatus.OK)
 
-    QUERY = "query"
-    LIMIT = "limit"
+    QUERY  = "query"
+    LIMIT  = "limit"
     OFFSET = "offset"
     STATUS = "Status"
 
@@ -65,7 +62,7 @@ class DiscoveryClient:
 
         return self.client.call_api(DiscoveryClient.DSL_SEARCH, AtlasSearchResult, query_params)
 
-    def dsl_search_with_params(self, query, limit=DEFAULT_LIMIT, offset=DEFAULT_OFFSET):
+    def dsl_search_with_params(self, query, limit, offset):
         query_params = {DiscoveryClient.QUERY: query, DiscoveryClient.LIMIT: limit, DiscoveryClient.OFFSET: offset}
 
         return self.client.call_api(DiscoveryClient.DSL_SEARCH, AtlasSearchResult, query_params)
@@ -75,32 +72,28 @@ class DiscoveryClient:
 
         return self.client.call_api(DiscoveryClient.FULL_TEXT_SEARCH, AtlasSearchResult, query_params)
 
-    def full_text_search_with_params(self, query, limit=DEFAULT_LIMIT, offset=DEFAULT_OFFSET):
+    def full_text_search_with_params(self, query, limit, offset):
         query_params = {DiscoveryClient.QUERY: query, DiscoveryClient.LIMIT: limit, DiscoveryClient.OFFSET: offset}
 
         return self.client.call_api(DiscoveryClient.FULL_TEXT_SEARCH, AtlasSearchResult, query_params)
 
-    def basic_search(self, type_name, classification, query, exclude_deleted_entities,
-                     sort_by_attribute=None, sort_order=None,
-                     limit=DEFAULT_LIMIT, offset=DEFAULT_OFFSET):
+    def basic_search(self, type_name, classification, query, exclude_deleted_entities, limit, offset):
         query_params = {"typeName": type_name, "classification": classification, DiscoveryClient.QUERY: query,
                         "excludeDeletedEntities": exclude_deleted_entities, DiscoveryClient.LIMIT: limit,
-                        DiscoveryClient.OFFSET: offset, "sortBy": sort_by_attribute, "sortOrder": sort_order}
+                        DiscoveryClient.OFFSET: offset }
 
         return self.client.call_api(DiscoveryClient.BASIC_SEARCH, AtlasSearchResult, query_params)
 
     def faceted_search(self, search_parameters):
-        return self.client.call_api(DiscoveryClient.FACETED_SEARCH, AtlasSearchResult, None, search_parameters)
+        return self.client.call_api(DiscoveryClient.FACETED_SEARCH, AtlasSearchResult, search_parameters)
 
-    def attribute_search(self, type_name, attr_name, attr_value_prefix, limit=DEFAULT_LIMIT, offset=DEFAULT_OFFSET):
+    def attribute_search(self, type_name, attr_name, attr_value_prefix, limit, offset):
         query_params = {"attrName": attr_name, "attrValuePrefix": attr_value_prefix, "typeName": type_name,
                         DiscoveryClient.LIMIT: limit, DiscoveryClient.OFFSET: offset}
 
         return self.client.call_api(DiscoveryClient.ATTRIBUTE_SEARCH, AtlasSearchResult, query_params)
 
-    def relationship_search(self, guid, relation, sort_by_attribute, sort_order, exclude_deleted_entities,
-                            limit=DEFAULT_LIMIT,
-                            offset=DEFAULT_OFFSET):
+    def relationship_search(self, guid, relation, sort_by_attribute, sort_order, exclude_deleted_entities, limit, offset):
         query_params = {"guid": guid, "relation": relation, "sortBy": sort_by_attribute,
                         "excludeDeletedEntities": exclude_deleted_entities,
                         DiscoveryClient.LIMIT: limit, DiscoveryClient.OFFSET: offset}
@@ -110,7 +103,7 @@ class DiscoveryClient:
 
         return self.client.call_api(DiscoveryClient.RELATIONSHIP_SEARCH, AtlasSearchResult, query_params)
 
-    def quick_search(self, query, type_name, exclude_deleted_entities, limit=DEFAULT_LIMIT, offset=DEFAULT_OFFSET):
+    def quick_search(self, query, type_name, exclude_deleted_entities, limit, offset):
         query_params = {"query": query, "typeName": type_name, "excludeDeletedEntities": exclude_deleted_entities,
                         DiscoveryClient.LIMIT: limit, DiscoveryClient.OFFSET: offset}
 
@@ -155,11 +148,9 @@ class DiscoveryClient:
     def execute_saved_search(self, user_name, search_name):
         query_params = {"user", user_name}
 
-        return self.client.call_api(
-            DiscoveryClient.EXECUTE_SAVED_SEARCH_BY_NAME.format_path({'search_name': search_name}),
-            AtlasSearchResult, query_params)
+        return self.client.call_api(DiscoveryClient.EXECUTE_SAVED_SEARCH_BY_NAME.format_path({'search_name': search_name}),
+                                    AtlasSearchResult, query_params)
 
     def execute_saved_search(self, search_guid):
-        return self.client.call_api(
-            DiscoveryClient.EXECUTE_SAVED_SEARCH_BY_GUID.format_path({'search_guid': search_guid}),
-            AtlasSearchResult)
+        return self.client.call_api(DiscoveryClient.EXECUTE_SAVED_SEARCH_BY_GUID.format_path({'search_guid': search_guid}),
+                                    AtlasSearchResult)
