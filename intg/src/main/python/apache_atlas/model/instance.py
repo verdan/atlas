@@ -121,7 +121,7 @@ class AtlasEntitiesWithExtInfo(AtlasEntityExtInfo):
     def type_coerce_attrs(self):
         super(AtlasEntitiesWithExtInfo, self).type_coerce_attrs()
 
-        self.entities = type_coerce_list(self.entity, AtlasEntity)
+        self.entities = type_coerce_list(self.entities, AtlasEntity)
 
     def add_entity(self, entity):
         if self.entities is None:
